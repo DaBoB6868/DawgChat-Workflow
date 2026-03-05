@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DawgChat Log</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: #e94560;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #c0c0c0;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: #16213e;
+            color: #e0e0e0;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #e94560;
+        }
+
+        textarea {
+            min-height: 160px;
+            resize: vertical;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #e94560;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.95rem;
+            min-height: 24px;
+        }
+
+        .status.success {
+            color: #4ecca3;
+        }
+
+        .status.error {
+            color: #e94560;
+        }
+
+        .status.loading {
+            color: #f0c040;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 DawgChat</h1>
+        <p class="subtitle">Log a resident conversation</p>
+
+        <form id="chatForm">
+            <div class="field">
+                <label for="residentName">Resident Name</label>
+                <input
+                    type="text"
+                    id="residentName"
+                    name="residentName"
+                    placeholder="e.g. John Smith"
+                    required
+                    autocomplete="off"
+                />
+            </div>
+
+            <div class="field">
+                <label for="conversationSummary">Conversation Summary</label>
+                <textarea
+                    id="conversationSummary"
+                    name="conversationSummary"
+                    placeholder="Briefly describe what you talked about..."
+                    required
+                ></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">Submit Conversation</button>
+        </form>
+
+        <p class="status" id="statusMsg"></p>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION — Replace this URL with your Activepieces
+        // webhook URL after you create the flow.
+        // ============================================================
+        const WEBHOOK_URL = 'YOUR_ACTIVEPIECES_WEBHOOK_URL_HERE';
+
+        const form = document.getElementById('chatForm');
+        const statusMsg = document.getElementById('statusMsg');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const residentName = document.getElementById('residentName').value.trim();
+            const conversationSummary = document.getElementById('conversationSummary').value.trim();
+
+            if (!residentName || !conversationSummary) {
+                statusMsg.textContent = 'Please fill in both fields.';
+                statusMsg.className = 'status error';
+                return;
+            }
+
+            // Prevent double-submit
+            submitBtn.disabled = true;
+            statusMsg.textContent = 'Submitting...';
+            statusMsg.className = 'status loading';
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        residentName: residentName,
+                        conversationSummary: conversationSummary
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
+                statusMsg.textContent = '✓ Submitted successfully!';
+                statusMsg.className = 'status success';
+                form.reset();
+            } catch (err) {
+                statusMsg.textContent = 'Error submitting. Please try again.';
+                statusMsg.className = 'status error';
+                console.error('Submission error:', err);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
