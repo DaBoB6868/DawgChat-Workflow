@@ -6,7 +6,7 @@ This workflow lets you:
 1. Open a mobile-friendly web page on your phone
 2. Enter a resident name + raw conversation notes
 3. AI (Gemini) enhances the summary, picks a theme, and identifies challenges
-4. The results are written to the correct row in your Excel workbook
+4. The results are written to the correct row in your Google Sheet
 
 ---
 
@@ -16,14 +16,14 @@ This workflow lets you:
 |------|----------------|
 | **Google AI Studio API Key** | https://aistudio.google.com/app/apikey |
 | **Activepieces account** | https://www.activepieces.com (cloud) or self-host |
-| **Excel workbook on OneDrive** | Create one with columns: **A = Resident Name**, **B = Enhanced Summary**, **C = Theme**, **D = Challenges** |
+| **Google Sheet** | Create one with columns: **A = Resident Name**, **B = Enhanced Summary**, **C = Theme**, **D = Challenges** |
 | **A place to host the mobile form** | GitHub Pages (free), Netlify, Vercel, or any static host |
 
 ---
 
-## Step 1: Prepare Your Excel Workbook
+## Step 1: Prepare Your Google Sheet
 
-1. Create a new Excel workbook in OneDrive (or upload an existing `.xlsx` file).
+1. Create a new Google Sheet (or use an existing one).
 2. Set up the header row:
 
 | A | B | C | D |
@@ -31,8 +31,11 @@ This workflow lets you:
 | Resident Name | Enhanced Summary | Theme | Challenges |
 
 3. Pre-fill column A with all your resident names (the workflow will search this column).
-4. Note the **file path** in OneDrive (e.g., `/DawgChat.xlsx`).
-5. Note the **worksheet tab name** (default is `Sheet1`).
+4. Copy the **Spreadsheet ID** from the URL:
+   ```
+   https://docs.google.com/spreadsheets/d/SPREADSHEET_ID_HERE/edit
+   ```
+5. Note the **sheet tab name** (default is `Sheet1`).
 
 ---
 
@@ -70,25 +73,25 @@ This workflow lets you:
 
 4. Click **Test** to verify it returns JSON with `enhancedSummary`, `theme`, and `challenges`.
 
-### 2d. Add Step 2: Microsoft Excel 365 (Two Options)
+### 2d. Add Step 2: Google Sheets (Two Options)
 
-#### OPTION A: Use Built-in Excel 365 Pieces (Easier, No Code)
+#### OPTION A: Use Built-in Google Sheets Pieces (Easier, No Code) ← RECOMMENDED
 
 **Sub-step 2d-i: Find Row**
-1. Click **+** → search **Microsoft Excel 365** → select **Find Rows**.
-2. Connect your Microsoft account (OneDrive access).
+1. Click **+** → search **Google Sheets** → select **Find Rows**.
+2. Connect your Google account.
 3. Configure:
-   - **Workbook**: Select your Excel file
-   - **Worksheet**: Select the tab (e.g., Sheet1)
+   - **Spreadsheet**: Select your sheet
+   - **Sheet**: Select the tab (e.g., Sheet1)
    - **Column**: A (Resident Name)
    - **Value**: `{{step_1.residentName}}` (from the Code step output)
 4. Test it.
 
 **Sub-step 2d-ii: Update Row**
-1. Click **+** → search **Microsoft Excel 365** → select **Update Row**.
+1. Click **+** → search **Google Sheets** → select **Update Row**.
 2. Configure:
-   - **Workbook**: Same Excel file
-   - **Worksheet**: Same tab
+   - **Spreadsheet**: Same sheet
+   - **Sheet**: Same tab
    - **Row Number**: `{{step_2.row}}` (from the Find Row result — check exact path)
    - **Values**:
      - Column B: `{{step_1.enhancedSummary}}`
@@ -99,7 +102,7 @@ This workflow lets you:
 #### OPTION B: Use Code Step (More Control)
 
 1. Click **+** → add another **Code** step.
-2. Paste the contents of `activepieces-steps/step2-excel.js`.
+2. Paste the contents of `activepieces-steps/step2-google-sheets.js`.
 3. Set up Inputs:
 
 | Input Name | Value |
@@ -108,11 +111,11 @@ This workflow lets you:
 | `enhancedSummary` | `{{step_1.enhancedSummary}}` |
 | `theme` | `{{step_1.theme}}` |
 | `challenges` | `{{step_1.challenges}}` |
-| `microsoftAccessToken` | From your Microsoft 365 connection (Activepieces manages this) |
-| `workbookPath` | Your OneDrive file path (e.g., `/DawgChat.xlsx`) |
-| `worksheetName` | `Sheet1` (or your tab name) |
+| `googleAccessToken` | From your Google Sheets connection (Activepieces manages this) |
+| `spreadsheetId` | Your spreadsheet ID (from the URL) |
+| `sheetName` | `Sheet1` (or your tab name) |
 
-> **Note on microsoftAccessToken**: If you use code to call Excel directly via the Microsoft Graph API, you'll need the OAuth token from an Activepieces Microsoft connection. The easier path is **Option A** (built-in pieces). Option B is for advanced usage.
+> **Note on googleAccessToken**: If you use code to call Sheets directly, you'll need the OAuth token from an Activepieces Google connection. The easier path is **Option A** (built-in pieces). Option B is for advanced usage.
 
 ### 2e. Publish the Flow
 1. Click **Publish** in the top-right.
@@ -156,10 +159,10 @@ This gives you an app-like icon that opens the form directly.
 ## Step 4: Test End-to-End
 
 1. Open the form on your phone.
-2. Enter a resident name that exists in your Excel workbook column A.
+2. Enter a resident name that exists in your Google Sheet column A.
 3. Type a quick raw summary like: "talked about missing home and not eating well lately"
 4. Hit **Submit**.
-5. Check your Excel workbook — within a few seconds you should see:
+5. Check your Google Sheet — within a few seconds you should see:
    - **Column B**: A polished version of the summary
    - **Column C**: A theme like "Well-being"
    - **Column D**: "Homesickness; Poor eating habits" (or "None")
@@ -187,7 +190,7 @@ These are defined in the Gemini prompt and can be edited in `step1-gemini-call.j
 Edit the `SYSTEM_PROMPT` in `step1-gemini-call.js` — update both the prompt text and the `VALID_THEMES` array.
 
 ### Change which columns get written
-Edit `step2-excel.js` — update the range addresses (e.g., change `B${excelRow}:D${excelRow}` to different columns).
+Edit `step2-google-sheets.js` — update the `writeRange` variable (e.g., change `B${targetRow}:D${targetRow}` to different columns).
 
 ### Add date/time stamp
 In `step1-gemini-call.js`, add to the return:
@@ -208,8 +211,8 @@ Then map it to a column in the Sheets step.
 |---------|-----|
 | Form shows "Error submitting" | Check the webhook URL is correct and the flow is published |
 | Gemini returns garbled text | The API key may be invalid — test it at https://aistudio.google.com |
-| Resident not found in workbook | Names must match exactly (case-insensitive). Check for extra spaces |
-| Excel / Microsoft auth fails | Reconnect Microsoft account in Activepieces connections |
+| Resident not found in sheet | Names must match exactly (case-insensitive). Check for extra spaces |
+| Google Sheets auth fails | Reconnect Google account in Activepieces connections |
 | Flow doesn't trigger | Make sure the flow is **Published** (not draft) |
 
 ---
@@ -221,7 +224,7 @@ DawgChat Workflow/
 ├── mobile-form/
 │   └── index.html          ← Phone form (host this)
 ├── activepieces-steps/
-│   ├── step1-gemini-call.js  ← Paste into Activepieces Code step 1
-│   └── step2-excel.js        ← Paste into Activepieces Code step 2 (Option B)
-└── SETUP-GUIDE.md           ← This file
+│   ├── step1-gemini-call.js       ← Paste into Activepieces Code step 1
+│   └── step2-google-sheets.js     ← Paste into Activepieces Code step 2 (Option B)
+└── SETUP-GUIDE.md                 ← This file
 ```
