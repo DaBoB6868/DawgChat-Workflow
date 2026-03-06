@@ -157,7 +157,7 @@
         // CONFIGURATION — Replace this URL with your Activepieces
         // webhook URL after you create the flow.
         // ============================================================
-        const WEBHOOK_URL = 'YOUR_ACTIVEPIECES_WEBHOOK_URL_HERE';
+        const WEBHOOK_URL = 'https://cloud.activepieces.com/api/v1/webhooks/yDfWVa5nNBEYlDb4kI7nB';
 
         const form = document.getElementById('chatForm');
         const statusMsg = document.getElementById('statusMsg');
@@ -183,16 +183,12 @@
             try {
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         residentName: residentName,
                         conversationSummary: conversationSummary
                     })
                 });
-
-                if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}`);
-                }
 
                 statusMsg.textContent = '✓ Submitted successfully!';
                 statusMsg.className = 'status success';
