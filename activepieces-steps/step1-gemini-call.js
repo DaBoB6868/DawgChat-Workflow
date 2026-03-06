@@ -40,14 +40,14 @@ export const code = async (inputs) => {
 
         // Replace the resident's own name (first, last, full — case-insensitive)
         const nameParts = name.trim().split(/\s+/);
+        // Replace full name first (as a unit), then individual parts
+        if (nameParts.length > 1) {
+            text = text.replace(new RegExp('\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi'), 'Resident');
+        }
         for (const part of nameParts) {
             if (part.length >= 2) {
-                text = text.replace(new RegExp(part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), 'Resident');
+                text = text.replace(new RegExp('\\b' + part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi'), 'Resident');
             }
-        }
-        // Also replace full name as a unit
-        if (nameParts.length > 1) {
-            text = text.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), 'Resident');
         }
 
         // Emails
@@ -88,7 +88,7 @@ export const code = async (inputs) => {
         // Check for the resident's actual name
         const nameParts = originalName.trim().split(/\s+/);
         for (const part of nameParts) {
-            if (part.length >= 2 && new RegExp(part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(text)) {
+            if (part.length >= 2 && new RegExp('\\b' + part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(text)) {
                 return true;
             }
         }
