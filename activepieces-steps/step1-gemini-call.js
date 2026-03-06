@@ -17,8 +17,21 @@
 // ================================================================
 
 export const code = async (inputs) => {
-    const residentName = inputs.residentName;
-    const rawSummary = inputs.conversationSummary;
+    // Handle both parsed JSON body and raw text body
+    let residentName = inputs.residentName;
+    let rawSummary = inputs.conversationSummary;
+
+    // If body came as text/plain, Activepieces may pass raw body string
+    if (!residentName && inputs.body) {
+        try {
+            const parsed = typeof inputs.body === 'string' ? JSON.parse(inputs.body) : inputs.body;
+            residentName = parsed.residentName;
+            rawSummary = parsed.conversationSummary;
+        } catch (e) {
+            // body wasn't JSON
+        }
+    }
+
     const apiKey = inputs.groqApiKey; // passed from Activepieces connection/config
 
     // ── The predetermined prompt ──────────────────────────────────
