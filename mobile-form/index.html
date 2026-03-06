@@ -50,7 +50,8 @@
         }
 
         input[type="text"],
-        textarea {
+        textarea,
+        select {
             width: 100%;
             padding: 12px 14px;
             border: 2px solid #333;
@@ -63,8 +64,14 @@
         }
 
         input[type="text"]:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             border-color: #e94560;
+        }
+
+        select option {
+            background: #16213e;
+            color: #e0e0e0;
         }
 
         textarea {
@@ -126,14 +133,55 @@
         <form id="chatForm">
             <div class="field">
                 <label for="residentName">Resident Name</label>
-                <input
-                    type="text"
-                    id="residentName"
-                    name="residentName"
-                    placeholder="e.g. John Smith"
-                    required
-                    autocomplete="off"
-                />
+                <select id="residentName" name="residentName" required>
+                    <option value="" disabled selected>Select a resident...</option>
+                    <option value="Davionee Williams">Davionee Williams</option>
+                    <option value="John Hullander">John Hullander</option>
+                    <option value="Kyler Litz">Kyler Litz</option>
+                    <option value="Lee Mcelhenney">Lee Mcelhenney</option>
+                    <option value="Joseph Schrage">Joseph Schrage</option>
+                    <option value="Sintayehu Jones">Sintayehu Jones</option>
+                    <option value="Darren Chen">Darren Chen</option>
+                    <option value="Khen Khup">Khen Khup</option>
+                    <option value="Jack Conolly">Jack Conolly</option>
+                    <option value="Reginald Moorman (Reggie)">Reginald Moorman (Reggie)</option>
+                    <option value="Robert Morell(RJ)">Robert Morell (RJ)</option>
+                    <option value="Austin Harris">Austin Harris</option>
+                    <option value="William Holt(Will)">William Holt (Will)</option>
+                    <option value="Caleb Vang">Caleb Vang</option>
+                    <option value="Ryan Miller">Ryan Miller</option>
+                    <option value="Patrick Deighan">Patrick Deighan</option>
+                    <option value="Benjamin Githanga">Benjamin Githanga</option>
+                    <option value="Jamal-Jadon Ogbidi">Jamal-Jadon Ogbidi</option>
+                    <option value="Jason Lyons">Jason Lyons</option>
+                    <option value="Kyle McDole">Kyle McDole</option>
+                    <option value="Kaden Keiser">Kaden Keiser</option>
+                    <option value="Christopher Hewatt (Jackson)">Christopher Hewatt (Jackson)</option>
+                    <option value="Edmund Giering (Jake)">Edmund Giering (Jake)</option>
+                    <option value="Charles Fennel (Charilie)">Charles Fennel (Charilie)</option>
+                    <option value="Nicolas Behrens">Nicolas Behrens</option>
+                    <option value="Krish Chinta">Krish Chinta</option>
+                    <option value="Jack Douglas">Jack Douglas</option>
+                    <option value="Jackson Hester">Jackson Hester</option>
+                    <option value="Daniel Lu">Daniel Lu</option>
+                    <option value="Anthony Wang">Anthony Wang</option>
+                    <option value="Spencer Dobson">Spencer Dobson</option>
+                    <option value="Alex Mahran-Galindo">Alex Mahran-Galindo</option>
+                    <option value="Cayden Dykstra">Cayden Dykstra</option>
+                    <option value="Ivan Ivanov">Ivan Ivanov</option>
+                    <option value="Rowan Mathis">Rowan Mathis</option>
+                    <option value="Logan Brown">Logan Brown</option>
+                    <option value="Jordan Wolff">Jordan Wolff</option>
+                    <option value="Jaylen O'Brien">Jaylen O'Brien</option>
+                    <option value="Chidubem Ugboh(Andrew)">Chidubem Ugboh (Andrew)</option>
+                    <option value="Ethan Kim">Ethan Kim</option>
+                    <option value="Aidan McConnell">Aidan McConnell</option>
+                    <option value="Mikhael Dahlen (Misha)">Mikhael Dahlen (Misha)</option>
+                    <option value="Aidan Paul">Aidan Paul</option>
+                    <option value="Nathel Mundackal">Nathel Mundackal</option>
+                    <option value="Hugh Johnson">Hugh Johnson</option>
+                    <option value="Donovan Howard">Donovan Howard</option>
+                </select>
             </div>
 
             <div class="field">
