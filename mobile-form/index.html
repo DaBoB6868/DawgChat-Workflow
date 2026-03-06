@@ -123,10 +123,57 @@
         .status.loading {
             color: #f0c040;
         }
+
+        /* PIN gate */
+        #pinGate {
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        #pinGate h2 {
+            color: #e94560;
+            margin-bottom: 12px;
+        }
+
+        #pinGate input {
+            width: 160px;
+            text-align: center;
+            padding: 12px;
+            font-size: 1.4rem;
+            letter-spacing: 8px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: #16213e;
+            color: #e0e0e0;
+            outline: none;
+        }
+
+        #pinGate input:focus {
+            border-color: #e94560;
+        }
+
+        #pinError {
+            color: #e94560;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- PIN gate -->
+        <div id="pinGate">
+            <h2>🔒 DawgChat</h2>
+            <p style="color:#888; margin-bottom:16px;">Enter PIN to continue</p>
+            <input type="password" id="pinInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+            <p id="pinError"></p>
+        </div>
+
+        <!-- Main form (hidden until PIN is correct) -->
+        <div id="mainApp" class="hidden">
         <h1>🐾 DawgChat</h1>
         <p class="subtitle">Log a resident conversation</p>
 
@@ -198,9 +245,38 @@
         </form>
 
         <p class="status" id="statusMsg"></p>
+        </div><!-- /mainApp -->
     </div>
 
     <script>
+        // ============================================================
+        // PIN GATE — change this to whatever 4-digit PIN you want
+        // ============================================================
+        const ACCESS_PIN = '6868';
+
+        const pinGate = document.getElementById('pinGate');
+        const mainApp = document.getElementById('mainApp');
+        const pinInput = document.getElementById('pinInput');
+        const pinError = document.getElementById('pinError');
+
+        // Check if already authenticated
+        if (localStorage.getItem('dawgchat_auth') === 'ok') {
+            pinGate.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+        }
+
+        pinInput.addEventListener('input', () => {
+            if (pinInput.value.length === 4) {
+                if (pinInput.value === ACCESS_PIN) {
+                    localStorage.setItem('dawgchat_auth', 'ok');
+                    pinGate.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                } else {
+                    pinError.textContent = 'Wrong PIN';
+                    pinInput.value = '';
+                }
+            }
+        });
         // ============================================================
         // CONFIGURATION — Replace this URL with your Activepieces
         // webhook URL after you create the flow.
