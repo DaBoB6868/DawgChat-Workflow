@@ -68,12 +68,12 @@ export const code = async (inputs) => {
 
     if (targetRow === -1) {
         // Resident not found — append a new row instead
-        const appendUrl = `${baseUrl}/values/${encodeURIComponent(sheetName + '!A:D')}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+        const appendUrl = `${baseUrl}/values/${encodeURIComponent(sheetName + '!A:I')}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
         const appendRes = await fetch(appendUrl, {
             method: 'POST',
             headers,
             body: JSON.stringify({
-                values: [[residentName, enhancedSummary, theme, challenges]]
+                values: [[residentName, '', '', '', '', '', enhancedSummary, theme, challenges]]
             })
         });
 
@@ -92,12 +92,11 @@ export const code = async (inputs) => {
         };
     }
 
-    // ── 3. Update columns B, C, D in the found row ───────────────
-    //    Column A = Resident Name (already there)
-    //    Column B = Enhanced Summary
-    //    Column C = Theme
-    //    Column D = Challenges
-    const writeRange = `${sheetName}!B${targetRow}:D${targetRow}`;
+    // ── 3. Update columns G, H, I in the found row ───────────────
+    //    Column G = Overall Conversation (Dawg Chat #2)
+    //    Column H = Overall Theme (Dawg Chat #2)
+    //    Column I = Challenge (Dawg Chat #2)
+    const writeRange = `${sheetName}!G${targetRow}:I${targetRow}`;
     const writeUrl = `${baseUrl}/values/${encodeURIComponent(writeRange)}?valueInputOption=USER_ENTERED`;
 
     const writeRes = await fetch(writeUrl, {

@@ -1,5 +1,5 @@
 // ================================================================
-//  ACTIVEPIECES — CODE STEP 1: Call Gemini API
+//  ACTIVEPIECES — CODE STEP 1: Call Groq AI API
 // ================================================================
 //  Paste this into an Activepieces "Code" piece.
 //  
@@ -8,7 +8,7 @@
 //    - params.conversationSummary (string)
 //
 //  Secrets / Connection values you'll configure in Activepieces:
-//    - GEMINI_API_KEY  (your Google AI Studio key)
+//    - GROQ_API_KEY  (free from https://console.groq.com/keys)
 //
 //  Outputs:
 //    - enhancedSummary  (string)
@@ -19,7 +19,7 @@
 export const code = async (inputs) => {
     const residentName = inputs.residentName;
     const rawSummary = inputs.conversationSummary;
-    const apiKey = inputs.geminiApiKey; // passed from Activepieces connection/config
+    const apiKey = inputs.groqApiKey; // passed from Activepieces connection/config
 
     // ── The predetermined prompt ──────────────────────────────────
     const SYSTEM_PROMPT = `You are a professional conversation-log assistant for a residential community program called DawgChat.
@@ -44,37 +44,37 @@ Rules:
 
     const userMessage = `Resident Name: ${residentName}\n\nRaw Conversation Summary:\n${rawSummary}`;
 
-    // ── Call Gemini API ───────────────────────────────────────────
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+    // ── Call Groq API (OpenAI-compatible format) ──────────────────
+    const url = 'https://api.groq.com/openai/v1/chat/completions';
 
     const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
         body: JSON.stringify({
-            contents: [
-                {
-                    role: 'user',
-                    parts: [{ text: SYSTEM_PROMPT + '\n\n' + userMessage }]
-                }
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+                { role: 'system', content: SYSTEM_PROMPT },
+                { role: 'user', content: userMessage }
             ],
-            generationConfig: {
-                temperature: 0.4,
-                maxOutputTokens: 1024
-            }
+            temperature: 0.4,
+            max_tokens: 1024
         })
     });
 
     if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Gemini API error ${response.status}: ${errText}`);
+        throw new Error(`Groq API error ${response.status}: ${errText}`);
     }
 
     const data = await response.json();
 
-    // Extract the text content from Gemini's response
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Extract the text content from Groq's response
+    const rawText = data.choices?.[0]?.message?.content;
     if (!rawText) {
-        throw new Error('No text returned from Gemini. Full response: ' + JSON.stringify(data));
+        throw new Error('No text returned from Groq. Full response: ' + JSON.stringify(data));
     }
 
     // Parse the JSON — strip potential markdown fences just in case
